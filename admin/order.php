@@ -64,9 +64,9 @@
                                     <tr>
                                         <td><?php echo $sn++; ?></td>
                                         <td><?php echo $item; ?></td>
-                                        <td><?php echo $price; ?></td>
+                                        <td>Rs.<?php echo $price; ?></td>
                                         <td><?php echo $qty; ?></td>
-                                        <td><?php echo $total; ?></td>
+                                        <td>Rs.<?php echo $total; ?></td>
                                         <td><?php echo $order_date; ?></td>
                                         <td><?php echo $status; ?></td>
                                         <td><?php echo $customer_name; ?></td>

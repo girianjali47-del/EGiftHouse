@@ -1,7 +1,11 @@
 <?php
-    include('config/constants.php');
-    //destroy session 
-    session_destroy(); //unset $_SESSION['user']
-    //redsirect to login page
-    header('location:'.SITEURL.'login.php');
+session_start();
+include('config/constants.php');  
+
+
+session_destroy();
+
+
+header('Location: ' . SITEURL . 'index.php');
+exit();
 ?>

@@ -51,7 +51,7 @@
         ?>
 
         <br><br>
-        <!-- button to add admin -->
+        
         <a href="<?php echo SITEURL; ?>admin/add-category.php" class="btn-primary">Add Category</a>
         <br>
         <br>
@@ -66,24 +66,23 @@
             </tr>
 
             <?php
-                //query to get all category from db
+                
                 $sql = "SELECT * FROM tbl_category";
 
-                //execute query
+                
                 $res = mysqli_query($conn, $sql);
 
-                //count rows
+                
                 $count = mysqli_num_rows($res);
 
-                //create serial num variable and asign value 1
+                
                 $sn=1;
 
 
-                //check wether we have data in db or not
+                
                 if($count>0)
                 {
-                    //data in db
-                    //get data and display
+                    
                     while($row=mysqli_fetch_assoc($res))
                     {
                         $id = $row['id'];
@@ -99,17 +98,17 @@
 
                                 <td>
                                     <?php 
-                                        //check wether image name is available or not
+                                       
                                         if($image_name!="")
                                         {
-                                            //display the image
+                                           
                                     ?>
                                             <img src="<?php echo SITEURL; ?>images/category/<?php echo $image_name; ?>" width="100px">
                                     <?php
                                         }
                                         else
                                         {
-                                            //display msg
+                                            
                                             echo "Image not added";
                                         }
                                     ?>
@@ -131,8 +130,7 @@
                 }
                     else
                     {
-                        //data not available
-                        //display msg inside table
+                        
                         ?>
                             <tr>
                                 <td colspan="6">No Category Added</td>

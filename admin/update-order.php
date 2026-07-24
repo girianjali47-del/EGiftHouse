@@ -5,12 +5,11 @@
         <br><br>
 
         <?php
-            // Check whether id is set or not
+            
             if(isset($_GET['id'])) {
-                // Get order details
+                
                 $id = $_GET['id'];
-                // Get all order details based on id
-                // SQL query
+                
                 $sql = "SELECT * FROM tbl_order WHERE id=$id";
                 // Execute the query
                 $res = mysqli_query($conn, $sql);
@@ -30,18 +29,17 @@
                     $customer_address = $row['customer_address'];
 
                 } else {
-                    // Details not available
-                    // Redirect to order page
+                    
                     header('location:'.SITEURL.'admin/order.php');
                 }
             } else {
-                // Redirect to order page
+                
                 header('location:'.SITEURL.'admin/order.php');
             }
         ?>
 
 <?php
-            // Check whether the update button is clicked or not
+            
             $err = [];
             if(isset($_POST['submit'])) {
                 // Get all values from form
@@ -85,7 +83,7 @@
                     // Execute the query
                     $res2 = mysqli_query($conn, $sql2);
     
-                    // Check whether updated or not and redirect
+                    
                     if($res2 == true) {
                         // Updated
                         $_SESSION['update'] = "<div class='success'>Order Updated Successfully</div>";

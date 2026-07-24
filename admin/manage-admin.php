@@ -1,5 +1,5 @@
 <?php include('partials/menu.php');?>
-        <!--main content section starts here-->
+        
         <div class="main">
             <div class="wrapper">
                 <h1>Manage Admin</h1>
@@ -9,8 +9,8 @@
                 <?php
                     if(isset($_SESSION['add']))
                     {
-                        echo $_SESSION['add']; //displaying session message
-                        unset($_SESSION['add']); //removing session message
+                        echo $_SESSION['add']; 
+                        unset($_SESSION['add']); 
                     }
 
                     if(isset($_SESSION['delete']))
@@ -48,7 +48,7 @@
                 ?>
                 <br>
                 <br>
-                <!-- button to add admin -->
+                
                 <a href="add-admin.php" class="btn-primary">Add Admin</a>
                 <br>
                 <br>
@@ -61,32 +61,30 @@
                     </tr>
 
                     <?php
-                        //query to get all admin
+                       
                         $sql = "SELECT * FROM tbl_admin";
-                        //execute query
+                        
                         $res = mysqli_query($conn, $sql);
-                        //check wether the query executed or not
+                        
                         if($res==TRUE)
                         {
-                            //count rows to check data in database 
-                            $count = mysqli_num_rows($res); // function to get all the rows in db
+                            
+                            $count = mysqli_num_rows($res); 
 
-                            $sn=1; //CREATE A VARIABLE and assign the value
-                            //check the no. opf rows
+                            $sn=1; 
+                           
                             if($count>0)
                             {
-                                //data in database
+                                
                                 while($rows=mysqli_fetch_assoc($res))
                                 {
-                                    //using while loop to get all the data from database
-                                    //and while loop willl run as long as data in data base
-
-                                    //get individyual data
+                                   
+                                    
                                     $id=$rows['id'];
                                     $full_name=$rows['full_name'];
                                     $username=$rows['username'];
 
-                                    //display value in talble
+                                    
                     ?>
 
                                 <tr>
@@ -97,7 +95,7 @@
                                     <td>
                                     <a href="<?php echo SITEURL; ?>admin/update-password.php?id=<?php echo $id;?>" class="btn-primary">Change Password</a>
                                         <a href="<?php echo SITEURL; ?>admin/update-admin.php?id=<?php echo $id;?>" class="btn-secondary">Update Admin</a>
-                                        <a href="<?php echo SITEURL; ?>admin/delete-admin.php?id=<?php echo $id;?>" class="btn-secondary1">Delete Admin</a>  
+                                        <!-- <a href="<?php echo SITEURL; ?>admin/delete-admin.php?id=<?php echo $id;?>" class="btn-secondary1">Delete Admin</a>   -->
                                     </td>
                                 </tr>
 
@@ -106,7 +104,7 @@
                             }
                                 else
                              {
-                                 //no data in database
+                                 
                              }
 
                         }
@@ -122,5 +120,5 @@
         </div>
 
         
-         <!--main content section ends here-->
+        
 <?php include('partials/footer.php')?>

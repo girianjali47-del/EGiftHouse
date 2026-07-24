@@ -1,89 +1,81 @@
-<?php include('partials-front/menu.php');?>
+<?php
+session_start();
+include('config.php');
+include('partials-front/menu.php');
 
-<!-- item SEARCH Section Starts Here -->
-<section class="search text-center">
+
+if (isset($_GET['item_id'])) {
+    $item_id = $_GET['item_id'];
+    $sql = "SELECT * FROM tbl_items WHERE id = $item_id";
+    $res = mysqli_query($conn, $sql);
+    $item = mysqli_fetch_assoc($res);
+} else {
+    header("Location: index.php");
+}
+?>
+
+<section class="item-details">
     <div class="container">
-        
-        <form action="<?php echo SITEURL; ?>item-search.php" method="POST">
-            <input type="search" name="search" placeholder="Search for item.." required>
-            <input type="submit" name="submit" value="Search" class="btn btn-primary">
-        </form>
+        <h2 class="section-title text-center">Item Details</h2>
+
+        <?php if ($item) { ?>
+            <div class="item-card">
+                <div class="item-img">
+                    <?php if ($item['image_name'] != "") { ?>
+                        <img src="<?php echo SITEURL; ?>images/item/<?php echo $item['image_name']; ?>" alt="<?php echo $item['title']; ?>">
+                    <?php } else { ?>
+                        <div class="no-image">Image not available</div>
+                    <?php } ?>
+                </div>
+
+                <div class="item-info">
+                    <h4><?php echo $item['title']; ?></h4>
+                    <p class="price">Rs. <?php echo $item['price']; ?></p>
+                    <p class="description"><?php echo $item['description']; ?></p>
+
+                    
+                    <button class="btn btn-primary add-to-cart-btn" data-id="<?php echo $item['id']; ?>">Add to Cart 🛒</button>
+
+                    
+                    <a href="order.php?item_id=<?php echo $item['id']; ?>" class="btn btn-primary">Order Now</a>
+                </div>
+            </div>
+        <?php } else { ?>
+            <div class="error">Item not found!</div>
+        <?php } ?>
     </div>
 </section>
-<!-- item SEARCH Section Ends Here -->
 
-<!-- item Menu Section Starts Here -->
-<section class="menu">
-    <div class="container">
-        <h2 class="text-center">Item Menu</h2>
 
-        <?php
-            // Display items that are active
-            $sql = "SELECT * FROM tbl_items WHERE active='Yes'";
-            // Execute
-            $res = mysqli_query($conn, $sql);
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
 
-            // Count rows 
-            $count = mysqli_num_rows($res);
-            // Check whether items are available or not
+    addToCartBtn.addEventListener('click', function () {
+        const itemId = this.getAttribute('data-id');
 
-            if($count > 0)
-            {
-                // Items available
-                while($row = mysqli_fetch_assoc($res))
-                {
-                    // Get values
-                    $id = $row['id'];
-                    $title = $row['title'];
-                    $description = $row['description'];
-                    $price = $row['price'];
-                    $image_name = $row['image_name'];
-                    ?>
-
-                    <div class="explore-box box-3">
-                        <div class="explore-menu-img">
-                            <?php
-                            // Check whether image is available or not
-                            if($image_name == "")
-                            {
-                                // Image not available
-                                echo "<div class='error'>Image Not Available</div>";
-                            }
-                            else
-                            {
-                                // Image available
-                                ?>
-                                <img src="<?php echo SITEURL; ?>images/item/<?php echo $image_name; ?>" alt="<?php echo $title; ?>" class="img-responsive img-curve">
-                                <?php
-                            }
-                            ?>
-                        </div>
-
-                        <div class="explore-menu-desc">
-                            <h4><?php echo $title; ?></h4>
-                            <p class="item-price">$<?php echo $price; ?></p>
-                            <p class="item-detail">
-                                <?php echo $description; ?>
-                            </p>
-                            <br>
-
-                            <a href="<?php echo SITEURL; ?>order.php?item_id=<?php echo $id; ?>" class="btn btn-primary">Order Now</a>
-                        </div>
-                    </div>
-
-                    <?php
+        fetch('add_to_cart.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'item_id=' + itemId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    cartCount.innerText = data.cart_count;
                 }
-            }
-            else
-            {
-                // Items not available
-                echo "<div class='error'>Item not Found</div>";
-            }
-        ?>
 
-        <div class="clearfix"></div>
-    </div>
-</section>
-<!-- item Menu Section Ends Here -->
+                
+                alert("Item added to cart!");
+            } else {
+                alert("Failed to add to cart.");
+            }
+        });
+    });
+});
+</script>
 
-<?php include('partials-front/footer.php');?>
+<?php include('partials-front/footer.php'); ?>

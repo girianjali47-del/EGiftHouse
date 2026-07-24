@@ -1,210 +1,219 @@
 <?php include('partials-front/menu.php'); ?>
 
 <?php
-// Check if user is logged in
+
 if (!isset($_SESSION["user_logged_in"]) || $_SESSION["user_logged_in"] !== true) {
     header("location: login.php");
     exit();
 }
 
-// Check whether item_id is set or not
-if(isset($_GET['item_id']))
-{
-    // Get the item id and details of the selected item
-    $item_id = $_GET['item_id'];
+require_once 'config/constants.php';
 
-    // Get the details for the selected food
-    $sql = "SELECT * FROM tbl_items WHERE id=?";
-    // Prepare statement
-    $stmt = mysqli_prepare($conn, $sql);
-    // Bind parameters
-    mysqli_stmt_bind_param($stmt, "i", $item_id);
-    // Execute
-    mysqli_stmt_execute($stmt);
-
-    // Get result
-    $res = mysqli_stmt_get_result($stmt);
-
-    // Count rows
-    $count = mysqli_num_rows($res);
-    // Check whether data is available or not
-    if($count == 1)
-    {
-        // We have data
-        // Get data from db
-        $row = mysqli_fetch_assoc($res);
-
-        $title = $row['title'];
-        $price = $row['price'];
-        $image_name = $row['image_name'];
-    }
-    else
-    {
-        // Item not available
-        // Redirect
-        header('location:'.SITEURL);
-        exit();
-    }
-}
-else
-{
-    // Redirect to home page
-    header('location:'.SITEURL);
+if (!isset($_GET['item_id'])) {
+    header('location:' . SITEURL);
     exit();
 }
 
-// Initialize error array
-$err = [];
+$item_id = intval($_GET['item_id']);
+$sql = "SELECT * FROM tbl_items WHERE id=?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $item_id);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
 
-// Check whether submit button is clicked or not
-if(isset($_POST['submit']))
-{
-    // Get all the details from the form
-    $item = $_POST['item'];
-    $price = $_POST['price'];
-    $qty = $_POST['qty'];
-    $total = $price * $qty; // total = price x qty
-    $order_date = date("Y-m-d H:i:s"); // Order date
-    $status = "Ordered"; // Status
-    $customer_name = $_SESSION['full_name'];
-    $customer_contact = $_POST['contact'];
-    $customer_email = $_POST['email'];
-    $customer_address = $_POST['address'];
-    $uid = $_SESSION['user_id'];
+if (mysqli_num_rows($res) !== 1) {
+    header('location:' . SITEURL);
+    exit();
+}
 
-    // Validate quantity
-    if(empty($qty) || !is_numeric($qty) || $qty <= 0) {
-        $err['quantity'] = "Quantity must be greater than zero.";
+$item = mysqli_fetch_assoc($res);
+
+
+$user_id = $_SESSION['user_id'];
+$sql_user = "SELECT * FROM tbl_users WHERE user_id=?";
+$stmt_user = mysqli_prepare($conn, $sql_user);
+mysqli_stmt_bind_param($stmt_user, "i", $user_id);
+mysqli_stmt_execute($stmt_user);
+$res_user = mysqli_stmt_get_result($stmt_user);
+
+if (!$res_user || mysqli_num_rows($res_user) !== 1) {
+    $_SESSION['order'] = "<div class='error text-center'>User details not found.</div>";
+    header('location:' . SITEURL);
+    exit();
+}
+
+$user = mysqli_fetch_assoc($res_user);
+
+
+$errors = [];
+
+if (isset($_POST['submit'])) {
+    $quantity = intval($_POST['qty']);
+    $address = trim($_POST['address']);
+
+    if ($quantity < 1) {
+        $errors[] = "Quantity must be at least 1.";
     }
 
-    // Validate email
-    if(empty($customer_email)){
-        $err['customer_email'] = "Email is required";
-    } elseif(!filter_var($customer_email, FILTER_VALIDATE_EMAIL)) {
-        $err['customer_email'] = "Enter valid email";
+    if (empty($address)) {
+        $errors[] = "Delivery address is required.";
     }
 
-    // Validate contact number
-    if(empty($customer_contact)) {
-        $err['customer_contact'] = "Contact is required";
-    } elseif(!preg_match("/^9[0-9]{9}$/", $customer_contact)) {
-        $err['customer_contact'] = "Invalid phone number";
-    }
+    if (empty($errors)) {
+        $total = $item['price'] * $quantity;
+        $order_date = date("Y-m-d H:i:s");
+        $status = "Ordered";
 
-    // Validate address
-    if(empty($customer_address)){
-        $err['customer_address'] = "Address is required";
-    }
+        $sql_insert = "INSERT INTO tbl_order (item, price, qty, total, order_date, status, customer_name, customer_contact, customer_email, customer_address, uid)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    // Save the order in the database
-    // Create SQL to save data
-    if(empty($err))
-    {
-        $sql2 = "INSERT INTO tbl_order (item, price, qty, total, order_date, status, customer_name, customer_contact, customer_email, customer_address, uid)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        // Prepare statement
-        $stmt2 = mysqli_prepare($conn, $sql2);
+        $stmt_insert = mysqli_prepare($conn, $sql_insert);
+        mysqli_stmt_bind_param($stmt_insert, "siddssssssi",
+            $item['title'], $item['price'], $quantity, $total,
+            $order_date, $status,
+            $user['full_name'], $user['phone'], $user['email'],
+            $address, $user_id
+        );
 
-        if ($stmt2) {
-            // Bind parameters
-            mysqli_stmt_bind_param($stmt2, "siddssssssi", $item, $price, $qty, $total, $order_date, $status, $customer_name, $customer_contact, $customer_email, $customer_address, $uid);
-
-            // Execute the query
-            if(mysqli_stmt_execute($stmt2))
-            {
-                // Query executed and order saved
-                $_SESSION['order'] = "<div class='success text-center'>Order Placed Successfully</div>";
-                header('location:'.SITEURL);
-                exit();
-            }
-            else
-            {
-                // Failed to save order
-                $_SESSION['order'] = "<div class='error text-center'>Failed to Place Order</div>";
-                header('location:'.SITEURL);
-                exit();
-            }
-        } else {
-            // Statement preparation failed
-            $_SESSION['order'] = "<div class='error text-center'>Database error: Unable to prepare statement.</div>";
-            header('location:'.SITEURL);
+        if (mysqli_stmt_execute($stmt_insert)) {
+            $_SESSION['order'] = "<div class='success text-center'>Order placed successfully!</div>";
+            header('location:' . SITEURL);
             exit();
+        } else {
+            $errors[] = "Failed to place the order. Please try again.";
         }
     }
 }
 ?>
 
-<!-- item SEARCH Section Starts Here -->
-<section class="search">
-    <div class="container">
-        
-        <h2 class="text-center text-white">Fill this form to confirm your order.</h2>
 
-        <?php if(!empty($err)): ?>
-            <div class="error">
-                <?php foreach($err as $error): ?>
-                    <p><?php echo $error; ?></p>
+<section style="padding: 60px 0; background-color: #f9f9f9;">
+    <div class="container" style="max-width: 900px; margin: auto;">
+
+        <h2 class="text-center" style="margin-bottom: 40px; color: #333;">Confirm Your Order</h2>
+
+        <?php if (!empty($errors)) : ?>
+            <div style="background: #ffe5e5; color: #cc0000; padding: 15px; margin-bottom: 20px; border-left: 5px solid #cc0000; border-radius:5px;">
+                <?php foreach ($errors as $error) : ?>
+                    <p><?php echo htmlspecialchars($error); ?></p>
                 <?php endforeach; ?>
             </div>
-        <?php endif; ?> 
+        <?php endif; ?>
 
-        <form action="" method="POST" class="order">
-            <div class="explore-menu-img">
-                <?php
-                    // Check whether image is available or not
-                    if($image_name == "")
-                    {
-                        // Image not available
-                        echo "<div class='error'>Image not Available</div>";
-                    }
-                    else
-                    {
-                        // Image available
-                        ?>
-                        <img src="<?php echo SITEURL; ?>images/item/<?php echo $image_name; ?>" alt="" class="img-responsive img-curve">
-                        <?php
-                    }
-                ?>
-            </div>
-            <div class="box">
-                
-                <div>
+        <!-- <form action="" method="POST" style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
 
-                    <h2 class="order-label">Selected item</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
 
-                    <h3 class="order-label"><?php echo $title; ?></h3>
-
-                    <input type="hidden" name="item" value="<?php echo $title; ?>">
-                    <input type="hidden" name="price" value="<?php echo $price; ?>">
-
-                    <p class="item-price order-label">$<?php echo $price; ?></p>
-
-                    <div class="order-label">Quantity</div>
-                    <input type="number" name="qty" class="input-responsive" value="1">
+               
+                <div style="flex: 1; text-align: center;">
+                    <?php if (!empty($item['image_name'])) : ?>
+                        <img src="<?php echo SITEURL . 'images/item/' . htmlspecialchars($item['image_name']); ?>" alt="Item Image" style="width:100%; max-width:300px; height:auto; border-radius:10px; object-fit:cover;">
+                    <?php else : ?>
+                        <div style="color:#888;">Image not available</div>
+                    <?php endif; ?>
                 </div>
-                <br><br>
+
                 
-                <div>
-                    <h2 class="order-label">Delivery Details</h2 >
-                    
-                    <div class="order-label">Phone Number</div>
-                    <input type="tel" name="contact" placeholder="E.g. 9843xxxxxx" class="input-responsive">
-                    
-                    <div class="order-label">Email</div>
-                    <input type="text" name="email" placeholder="E.g. hi@gmail.com" class="input-responsive">
-                    
-                    <div class="order-label">Address</div>
-                    <textarea name="address" rows="10" placeholder="E.g. Street, City, Country" class="input-responsive"></textarea>
-                    <br>
-                    
-                    <input type="submit" name="submit" value="Confirm Order" class="btn btn-primary">
+                <div style="flex: 2;">
+                    <h3 style="margin-bottom: 10px; color: #222;"><?php echo htmlspecialchars($item['title']); ?></h3>
+                    <p style="font-size: 18px; color: #666;">Price: <strong>Rs. <?php echo htmlspecialchars($item['price']); ?></strong></p>
+
+                    <input type="hidden" name="item" value="<?php echo htmlspecialchars($item['title']); ?>">
+                    <input type="hidden" name="price" value="<?php echo htmlspecialchars($item['price']); ?>">
+
+                    <div style="margin: 20px 0;">
+                        <label style="font-weight:bold;">Quantity</label>
+                        <input type="number" name="qty" value="1" min="1" required style="width: 100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+                    </div>
+
+                    <h4 style="margin-top:30px; margin-bottom:10px; color:#333;">Delivery Details</h4>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight:bold;">Full Name</label>
+                        <input type="text" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>"  style="width: 100%; padding:10px; border-radius:5px; background-color: #f0f0f0; border:1px solid #ccc; margin-top:5px;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight:bold;">Phone Number</label>
+                        <input type="tel" name="contact" value="<?php echo htmlspecialchars($user['phone']); ?>" style="width: 100%; padding:10px; border-radius:5px; background-color: #f0f0f0; border:1px solid #ccc; margin-top:5px;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight:bold;">Email</label>
+                        <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" style="width: 100%; padding:10px; border-radius:5px; background-color: #f0f0f0; border:1px solid #ccc; margin-top:5px;">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight:bold;">Address</label>
+                        <textarea name="address" rows="4" placeholder="Street, City" required style="width: 100%; padding:10px; border-radius:5px; border:1px solid #ccc; margin-top:5px;"></textarea>
+                    </div>
+
+                    <button type="submit" name="submit" style="width: 100%; padding: 12px; background-color: #28a745; color: white; font-size:16px; border:none; border-radius:5px; cursor:pointer; transition:0.3s;">
+                        Confirm Order
+                    </button>
                 </div>
+
             </div>
+
+        </form> -->
+        <form action="" method="POST" style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+
+               
+                <div style="flex: 1; text-align: center;">
+                    <?php if (!empty($item['image_name'])) : ?>
+                        <img src="<?php echo SITEURL . 'images/item/' . htmlspecialchars($item['image_name']); ?>" alt="Item Image" style="width:100%; max-width:300px; height:auto; border-radius:10px; object-fit:cover;">
+                    <?php else : ?>
+                        <div style="color:#888;">Image not available</div>
+                    <?php endif; ?>
+                </div>
+
+                
+                <div style="flex: 2;">
+                    <h3 style="margin-bottom: 10px; color: #222;"><?php echo htmlspecialchars($item['title']); ?></h3>
+                    <p style="font-size: 18px; color: #666;">Price: <strong>Rs. <?php echo htmlspecialchars($item['price']); ?></strong></p>
+
+                    <input type="hidden" name="item" value="<?php echo htmlspecialchars($item['title']); ?>">
+                    <input type="hidden" name="price" value="<?php echo htmlspecialchars($item['price']); ?>">
+
+                    <div style="margin: 20px 0;">
+                        <label style="font-weight:bold;">Quantity</label>
+                        <input type="number" name="qty" value="1" min="1" required style="width: 100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+                    </div>
+
+                    <h4 style="margin-top:30px; margin-bottom:10px; color:#333;">Delivery Details</h4>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight:bold;">Full Name</label>
+                        <input type="text" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>"  style="width: 100%; padding:10px; border-radius:5px; background-color: #f0f0f0; border:1px solid #ccc; margin-top:5px;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight:bold;">Phone Number</label>
+                        <input type="tel" name="contact" value="<?php echo htmlspecialchars($user['phone']); ?>" style="width: 100%; padding:10px; border-radius:5px; background-color: #f0f0f0; border:1px solid #ccc; margin-top:5px;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight:bold;">Email</label>
+                        <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" style="width: 100%; padding:10px; border-radius:5px; background-color: #f0f0f0; border:1px solid #ccc; margin-top:5px;">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight:bold;">Address</label>
+                        <textarea name="address" rows="4" placeholder="Street, City" required style="width: 100%; padding:10px; border-radius:5px; border:1px solid #ccc; margin-top:5px;"></textarea>
+                    </div>
+
+                    <button type="submit" name="submit" style="width: 100%; padding: 12px; background-color: #28a745; color: white; font-size:16px; border:none; border-radius:5px; cursor:pointer; transition:0.3s;">
+                        Confirm Order
+                    </button>
+                </div>
+
+            </div>
+
         </form>
-        
+
     </div>
 </section>
-<!-- item SEARCH Section Ends Here -->
 
 <?php include('partials-front/footer.php'); ?>

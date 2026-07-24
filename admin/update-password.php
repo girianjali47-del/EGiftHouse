@@ -48,7 +48,7 @@
 </div>
 
 <?php
-    //check whether the submit button is clicked or not
+    
     if(isset($_POST['submit']))
     {
         //get data from form

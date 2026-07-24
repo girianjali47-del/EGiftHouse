@@ -1,15 +1,25 @@
 <?php
-    //start session
-    session_start();
-    //create comstant to store non repeating value
-    define('SITEURL', 'http://localhost/etech/');
+
+if (!defined('SITEURL')) {
+    define('SITEURL', 'http://localhost/egifthouse/');
+}
+
+if (!defined('LOCALHOST')) {
     define('LOCALHOST', 'localhost');
+}
+
+if (!defined('DB_USERNAME')) {
     define('DB_USERNAME', 'root');
+}
+
+if (!defined('DB_PASSWORD')) {
     define('DB_PASSWORD', '');
-    define('DB_NAME', 'db_etech');
+}
+
+if (!defined('DB_NAME')) {
+    define('DB_NAME', 'db_egifthouse');
+}
 
 
-    $conn = mysqli_connect(LOCALHOST, DB_USERNAME, DB_PASSWORD) or die(mysqli_error());  //db connection
-    $db_select = mysqli_select_db($conn, DB_NAME) or die(mysqli_error());   //selecting bd
-
+$conn = mysqli_connect(LOCALHOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die(mysqli_error($conn)); 
 ?>

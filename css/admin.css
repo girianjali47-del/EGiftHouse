@@ -1,113 +1,113 @@
 /*
-    E-tech;
+    E-gifthouse;
 */
 
-*{
+* {
     margin: 0;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.wrapper{
-   
+.wrapper {
     padding: 1%;
     width: 80%;
     margin: 0 auto;
 }
 
-.text-center{
+.text-center {
     text-align: center;
 }
 
-.error{
-    color: red;
+.error {
+    color: #dc3545; /* red */
 }
 
-.clearfix{
+.clearfix {
     float: none;
     clear: both;
 }
 
-.tbl-full{
+.tbl-full {
     width: 100%;
 }
 
-.tbl-30{
+.tbl-30 {
     width: 30%;
 }
-table tr th{
-    border-bottom: 1px solid black;
+
+table tr th {
+    border-bottom: 1px solid #343a40; /* dark gray */
     padding: 1%;
     text-align: left;
 }
 
-table tr td{
+table tr td {
     padding: 1%;
 }
 
-.btn-primary{
-    background-color:#0fb117;
-    padding: 1%;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.btn-primary:hover{
-    background-color: #3fe447;
-}
-
-.btn-secondary{
-    background-color:#0fb117;
+.btn-primary {
+    background-color: #00bff4ee; /* purple */
     padding: 1%;
     color: white;
     text-decoration: none;
     font-weight: bold;
 }
 
-.btn-secondary:hover{
-    background-color: #aae43f;
+.btn-primary:hover {
+    background-color: #2db300; /* green */
 }
 
-.btn-secondary1{
-    background-color:#eb0000;
+.btn-secondary {
+    background-color: #6c757d; /* gray */
     padding: 1%;
     color: white;
     text-decoration: none;
     font-weight: bold;
 }
 
-.btn-secondary1:hover{
-    background-color: #ce5757;
+.btn-secondary:hover {
+    background-color: #5a6268; /* darker gray */
 }
 
+.btn-secondary1 {
+    background-color: #dc3545; /* red */
+    padding: 1%;
+    color: rgb(81, 43, 43);
+    text-decoration: none;
+    font-weight: bold;
+}
 
-/* css for menu*/
+.btn-secondary1:hover {
+    background-color: #c82333; /* darker red */
+}
 
-.menu ul{
+/* css for menu */
+.menu ul {
     list-style: none;
 }
-.menu ul li{
+
+.menu ul li {
     display: inline;
     padding: 1%;
 }
-.menu ul li a{
+
+.menu ul li a {
     text-decoration: none;
     font-weight: bold;
-    color: #0fb117;
-}
-.menu ul li a:hover{
-    color: #3fe447;
+    color: #e600ff; /* blue */
 }
 
+.menu ul li a:hover {
+    color: #0056b3; /* darker blue */
+}
 
 /* css for main */
-.main{
-
-    background-color: #f1f2f6;
+.main {
+    background-color: #f8f9fa; /* light gray */
     padding: 3% 0;
 }
-.col-4{
+
+.col-4 {
     width: 18%;
     background-color: white;
     margin: 1%;
@@ -115,23 +115,20 @@ table tr td{
     float: left;
 }
 
-
-
-
-
-/* css for footer*/
-.footer{
-    background-color: #0fb117;
+/* css for footer */
+.footer {
+    background-color: #a2aca4; 
     color: white;
-}
+    padding: 10px 0;
+    text-align: center;
 
 /* css for login */
-.login{
-    border: 1px solid grey;
+.login {
+    border: 1px solid #979da3; /* gray */
     width: 30%;
     margin: 10% auto;
     padding: 2%;
 }
 
-
-/*css for input*/
+/* css for input */
+}

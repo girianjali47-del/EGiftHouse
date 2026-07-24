@@ -1,18 +1,18 @@
 <?php include('partials/menu.php'); ?>
 
 <?php
-    // Check if ID is set
+    
     if(isset($_GET['id'])) {
         $id = $_GET['id'];
 
-        // SQL query to fetch item details
+        
         $sql = "SELECT * FROM tbl_items WHERE id=?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "i", $id);
         mysqli_stmt_execute($stmt);
         $res = mysqli_stmt_get_result($stmt);
 
-        // Fetch item details
+        
         if(mysqli_num_rows($res) == 1) {
             $row = mysqli_fetch_assoc($res);
             $title = $row['title'];
@@ -23,18 +23,18 @@
             $featured = $row['featured'];
             $active = $row['active'];
         } else {
-            // Item not found, redirect
+            
             $_SESSION['update'] = "<div class='error'>Item not found.</div>";
             header('location:'.SITEURL.'admin/item.php');
             exit;
         }
     } else {
-        // Redirect if ID is not set
+        
         header('location:'.SITEURL.'admin/item.php');
         exit;
     }
 
-    // Process form submission
+    
     if(isset($_POST['submit'])) {
         $id = $_POST['id'];
         $title = $_POST['title'];
@@ -68,46 +68,46 @@
             $errors[] = "Please select a category.";
         }
 
-        // Handle file upload if new image selected
+        
         if(isset($_FILES['image']['name']) && !empty($_FILES['image']['name'])) {
             $new_image_name = $_FILES['image']['name'];
             $tmp_name = $_FILES['image']['tmp_name'];
 
-            // Validate uploaded image
+            
             $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
             $file_extension = strtolower(pathinfo($new_image_name, PATHINFO_EXTENSION));
 
             if(!in_array($file_extension, $allowed_extensions)) {
                 $errors[] = "Invalid file type. Allowed types: jpg, jpeg, png, gif.";
             } else {
-                // Move the uploaded file
-                $new_image_name = "item_".time().'.'.$file_extension; // Renaming the image file
+                
+                $new_image_name = "item_".time().'.'.$file_extension; 
                 $destination_path = "../images/item/".$new_image_name;
                 $upload = move_uploaded_file($tmp_name, $destination_path);
 
-                // Check if image is uploaded
+                
                 if($upload == false) {
                     $errors[] = "Failed to upload the new image.";
                 }
 
-                // Remove the current image if new image is uploaded and available
+                
                 if(!empty($current_image)) {
                     $remove_path = "../images/item/".$current_image;
                     $remove = unlink($remove_path);
 
-                    // Check if image is removed
+                   
                     if($remove == false) {
                         $errors[] = "Failed to remove the current image.";
                     }
                 }
             }
         } else {
-            $new_image_name = $current_image; // Retain the current image if new image is not uploaded
+            $new_image_name = $current_image; 
         }
 
-        // If there are no errors, proceed with update
+        
         if(empty($errors)) {
-            // Update item in database
+           
             $sql_update = "UPDATE tbl_items SET 
                 title=?, 
                 description=?, 
@@ -121,7 +121,7 @@
             mysqli_stmt_bind_param($stmt2, "ssdssssi", $title, $description, $price, $new_image_name, $category, $featured, $active, $id);
             $res2 = mysqli_stmt_execute($stmt2);
 
-            // Check if the query executed successfully
+            
             if($res2) {
                 $_SESSION['update'] = '<div class="success">Item updated successfully.</div>';
             } else {
@@ -194,7 +194,7 @@
                     <td>
                         <select name="category" >
                             <?php
-                                // Fetch categories from database
+                                
                                 $sql = "SELECT * FROM tbl_category WHERE active='Yes'";
                                 $res = mysqli_query($conn, $sql);
 
@@ -241,7 +241,7 @@
         </form>
 
         <?php
-            // Display session messages if any
+            
             if(isset($_SESSION['update'])) {
                 echo $_SESSION['update'];
                 unset($_SESSION['update']);

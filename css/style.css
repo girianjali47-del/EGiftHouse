@@ -1,131 +1,128 @@
-/* 
-    E-Tech;
-*/
-
-/* css for all */
-*{
-    margin: 0 0 ;
+* {
+    margin: 0 0;
     padding: 0 0;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.error{
-    color: red;
+.error {
+    color: #dc3545; /* red */
 }
 
-.container{
-    
+.container {
     margin: 0 auto;
     padding: 1%;
 }
 
-.img-responsive{
+
+.img-responsive {
     width: 100%;
     height: 100%;
 }
 
-.text-center{
+.text-center {
     text-align: center;
 }
 
-.text-white{
-    color: white;
+.text-white {
+    color: rgb(225, 64, 64);
 }
 
-.text-right{
+.text-right {
     text-align: right;
 }
 
-.clearfix{
+.clearfix {
     clear: both;
     float: none;
 }
 
-a{
-    color: #0fb117;
+a {
+    color: #007bff; /* blue */
     text-decoration: none;
 }
-a:hover{
-    color: #3fe447;
+
+a:hover {
+    color: #0056b3; /* darker blue */
 }
 
-
-.btn{
+.btn {
     padding: 1%;
     border: none;
     font-size: 1rem;
     border-radius: 5%;
 }
 
-.btn-primary{
-    background-color: #0fb117;
-    color: white;
+
+.btn-primary {
+    background-color: #ffbf00; /* yellow */
+    color: rgb(121, 150, 140);
     cursor: pointer;
 }
 
-.btn-primary:hover{
+.btn-primary:hover {
     color: white;
-    background-color: #3fe447;
-
+    background-color: #0056b3; /* darker blue */
 }
 
-h2{
-    color: #2f3542;
+h2 {
+    color: #9b81c7; /* dark gray */
     font-size: 2rem;
     margin-bottom: 2%;
 }
-h3{
-    font-size: 1.5rem;
+
+h3 {
+    font-size: 1.6rem;
 }
 
-.float-container{
+.float-container {
     position: relative;
-    
 }
-.float-text{
+
+.float-text {
     position: absolute;
-    
     left: 35%;
 }
-filedset{
+
+fieldset {
     border: 1px solid white;
     margin: 5%;
     padding: 3%;
     border-radius: 5px;
     width: 50%;
 }
-.error{
-    padding: 2%;
-    color: red;
 
-}
-.success{
+.error {
     padding: 2%;
-    color: #0fb117;
+    color: #dc3545; /* red */
 }
 
-/* css for navbar*/
+.success {
+    padding: 2%;
+    color: #007bff; /* blue */
+}
 
-.logo{
-    
+/* css for navbar */
+.logo {
     width: 10%;
     float: left;
 }
-.menu{
+
+.menu {
     line-height: 50px;
 }
-.menu ul{
+
+.menu ul {
     list-style-type: none;
 }
 
-.menu ul li{
+.menu ul li {
     display: inline;
     padding: 1%;
     font-weight: bold;
 }
 
-/* css for Secrch*/
-.search{
+/* css for search */
+.search {
     background-image: url(../images/bg.jpg) !important;
     background-size: cover;
     background-repeat: no-repeat;
@@ -133,7 +130,7 @@ filedset{
     padding: 10% 0;
 }
 
-.search input[type="search"]{
+.search input[type="search"] {
     width: 50%;
     padding: 1%;
     font-size: 1rem;
@@ -141,14 +138,13 @@ filedset{
     border-radius: 5px;
 }
 
-
-/* css for Categories*/
-
-.categories{
+/* css for categories */
+.categories {
     padding: 4% 0;
 }
-.box-3{
-    border: 1px solid black;
+
+.box-3 {
+    border: 1px solid #343a40; /* dark gray */
     border-radius: 15px;
     width: 28%;
     float: left;
@@ -156,14 +152,12 @@ filedset{
 }
 
 /* css for explore items */
-
-.explore{
+.explore {
     background-color: #ececec;
     padding: 4%, 0;
 }
 
-.explore-box{
-   
+.explore-box {
     width: 43%;
     margin: 1%;
     float: left;
@@ -172,54 +166,54 @@ filedset{
     border-radius: 15px;
 }
 
-.box{
+.box {
     width: 25%;
     display: inline;
     margin-left: 50px;
 }
 
-.explore-menu-img{
+.explore-menu-img {
     width: 45%;
     float: left;
     top: 0;
 }
-.explore-menu-img-a{
+
+.explore-menu-img-a {
     width: 45%;
     float: left;
 }
 
-.explore-menu-desc{
+.explore-menu-desc {
     width: 50%;
     float: right;
     margin-left: 10px;
 }
 
-.price{
+.price {
     font-size: 1.2rem;
-    margin: 2%, o;
+    margin: 2%, 0;
 }
 
-.desc{
+.desc {
     font-size: 1rem;
-    color: #747d8c;
+    color: #747d8c; /* gray */
 }
 
-.order-label{
-    color: white;
+.order-label {
+    color: rgb(122, 41, 41);
 }
 
-/* css for social*/
-
- .social ul{
+/* css for social */
+.social ul {
     list-style-type: none;
 }
 
-.social ul li{
+.social ul li {
     display: inline;
     padding: 1%;
 }
 
-.size{
+.size {
     height: 10px;
 }
 

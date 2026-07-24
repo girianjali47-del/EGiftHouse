@@ -1,84 +1,124 @@
 <?php
-include('../config/constants.php');
+session_start();
+include('../config/constants.php'); 
 
 $err = [];
+$loginMessage = "";
 
-if(isset($_POST['submit'])) {
-    if(isset($_POST['username']) && !empty(trim($_POST['username']))) {
-        $username = trim($_POST['username']);
-    } else {
+
+if (isset($_POST['submit'])) {
+    
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if ($username === '') {
         $err['username'] = "Enter username";
     }
-
-    if(isset($_POST['password']) && !empty($_POST['password'])) {
-        $password = $_POST['password'];
-    } else {
+    if ($password === '') {
         $err['password'] = "Enter password";
     }
 
-    if(empty($err)) {
-        $sql = "SELECT * FROM tbl_admin WHERE username='$username'";
-        $res = mysqli_query($conn, $sql);
+    if (empty($err)) {
+        
+        $sql = "SELECT * FROM tbl_admin WHERE username = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-        if ($res) {
-            $row = mysqli_fetch_assoc($res);
-            if ($row) {
+            if ($result && mysqli_num_rows($result) === 1) {
+                $row = mysqli_fetch_assoc($result);
                 if (password_verify($password, $row['password'])) {
+                    // Successful login
                     $_SESSION['login'] = "Login Successful";
                     $_SESSION['user'] = $username;
-                    header('Location: ' . SITEURL . 'admin/');
+                    $_SESSION['admin_logged_in'] = true;
+
+                    header('Location: ' . SITEURL . 'admin/index.php');
                     exit;
+                } else {
+                    $loginMessage = "<span class='error'>Incorrect username or password.</span>";
                 }
             } else {
-                $_SESSION['login'] = "<span class='error text-center'>Username or Password didn't Match</span>";
-                header('Location: ' . SITEURL . 'admin/login.php');
-                exit;
+                $loginMessage = "<span class='error'>Incorrect username or password.</span>";
             }
+            mysqli_stmt_close($stmt);
         } else {
-            $_SESSION['login'] = "Database error: Unable to execute query.";
-            header('Location: ' . SITEURL . 'admin/login.php');
-            exit;
+            $loginMessage = "<span class='error'>Database query error.</span>";
         }
     }
 }
 ?>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Login Page</title>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
     <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        .error { color: red; }
+        .login {
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        input[type=submit] {
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        input[type=submit]:hover {
+            background-color: #0056b3;
+        }
+        h1.text-center {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    
-    <div class="login">
-        <h1 class="text-center">Admin Login</h1>
-        <br><br>
 
-        <!-- Error message display -->
-        <?php 
-        if(isset($_SESSION['login'])) {
-            echo $_SESSION['login'];
-            unset($_SESSION['login']);
-        }
-        ?>
-        <br><br>
+<div class="login">
+    <h1 class="text-center">Admin Login</h1>
 
-        <!-- Login form starts here -->
-        <form action="" method="POST" class="text-center">
-            Username: <br>
-            <span class="error"><?php if(isset($err['username'])) echo $err['username'] . "<br>"; ?></span>
-            <input type="text" name="username" placeholder="Enter Username">
-            <br><br>
-            Password: <br>
-            <span class="error"><?php if(isset($err['password'])) echo $err['password'] . "<br>"; ?></span>
-            <input type="password" name="password" placeholder="Enter Password">
-            <br><br>
-            <input type="submit" name="submit" value="Login" class="btn-primary">
-            <br><br>
-        </form>
-        <!-- Login form ends here -->
+    <?php if ($loginMessage): ?>
+        <div><?php echo $loginMessage; ?></div>
+    <?php endif; ?>
 
-        <p class="text-center">Created by - Rijan & Abisha</p>
-    </div>
+    <form action="" method="POST" autocomplete="off">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+        <?php if(isset($err['username'])): ?>
+            <div class="error"><?php echo $err['username']; ?></div>
+        <?php endif; ?>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password">
+        <?php if(isset($err['password'])): ?>
+            <div class="error"><?php echo $err['password']; ?></div>
+        <?php endif; ?>
+
+        <input type="submit" name="submit" value="Login">
+    </form>
+</div>
+
 </body>
 </html>
